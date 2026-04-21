@@ -1,0 +1,33 @@
+name: Scratch Trend Update
+
+on:
+  schedule:
+    # 1時間ごとに実行する設定（UTC時間なので少しズレますが自動で動きます）
+    - cron: '0 * * * *'
+  workflow_dispatch: # 手動で動かすためのボタンも作ります
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: リポジトリを読み込む
+        uses: actions/checkout@v3
+
+      - name: Pythonの準備
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: 必要なライブラリをインストール
+        run: pip install requests
+
+      - name: プログラムを実行
+        run: python main.py
+
+      - name: 更新したデータを保存する
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add data.json
+          git commit -m "トレンドデータを更新" || exit 0
+          git push
