@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scratch 日本トレンド (非公式)</title>
+    <style>
+        body { font-family: sans-serif; background: #f0f0f0; margin: 0; padding: 20px; }
+        h1 { text-align: center; color: #4d97ff; }
+        .container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
+        .card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: 0.3s; }
+        .card:hover { transform: translateY(-5px); }
+        .thumbnail { width: 100%; height: auto; display: block; }
+        .info { padding: 15px; }
+        .title { font-weight: bold; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .author { font-size: 0.9em; color: #666; margin-bottom: 10px; }
+        .stats { font-size: 0.85em; color: #4d97ff; font-weight: bold; }
+        a { text-decoration: none; color: inherit; }
+    </style>
+</head>
+<body>
+    <h1>🇯🇵 Scratch 日本トレンド</h1>
+    <div class="container" id="trend-list">読み込み中...</div>
+
+    <script>
+        async function loadTrends() {
+            try {
+                // data.jsonを読み込む（?t=でキャッシュを防止）
+                const response = await fetch('data.json?t=' + new Date().getTime());
+                const data = await response.json();
+                const list = document.getElementById('trend-list');
+                list.innerHTML = '';
+
+                data.forEach(p => {
+                    const card = `
+                        <a href="https://scratch.mit.edu/projects/${p.id}" target="_blank" class="card">
+                            <img src="${p.thumbnail}" class="thumbnail" alt="${p.title}">
+                            <div class="info">
+                                <div class="title">${p.title}</div>
+                                <div class="author">by ${p.author}</div>
+                                <div class="stats">👁 ${p.views.toLocaleString()} / ❤️ ${p.loves.toLocaleString()}</div>
+                            </div>
+                        </a>
+                    `;
+                    list.innerHTML += card;
+                });
+            } catch (e) {
+                document.getElementById('trend-list').innerText = 'データの読み込みに失敗しました。';
+            }
+        }
+        loadTrends();
+    </script>
+</body>
+</html>
